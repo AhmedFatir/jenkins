@@ -6,7 +6,8 @@ import org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl
 def instance = Jenkins.getInstance()
 def store = instance.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
 
-def kubeconfigContent = '''KUBECONFIG_CONTENT''' // Replace with kubeconfig content
+def kubeconfigFile = new File('/var/jenkins_home/.kube/config')
+def kubeconfigContent = kubeconfigFile.text
 
 def kubeconfigCreds = new StringCredentialsImpl(
     CredentialsScope.GLOBAL,

@@ -20,5 +20,6 @@ services:
       - 50000:50000
     volumes:
       - jenkins:/var/jenkins_home
+      - /home/ubuntu/.kube/config:/var/jenkins_home/.kube/config
     networks:
       - jenkins
