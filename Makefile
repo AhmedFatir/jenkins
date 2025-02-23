@@ -1,6 +1,6 @@
 all:
 	clear
-	docker compose up --build -d
+	docker compose up --build
 
 down:
 	docker compose down
