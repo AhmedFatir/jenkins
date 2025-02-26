@@ -4,8 +4,6 @@ import com.cloudbees.plugins.credentials.domains.*
 import com.cloudbees.plugins.credentials.impl.*
 import org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl
 import hudson.util.Secret
-import java.nio.file.Paths
-import java.nio.file.Files
 import java.util.logging.Logger
 
 // Initialize logger for debugging and informational messages
