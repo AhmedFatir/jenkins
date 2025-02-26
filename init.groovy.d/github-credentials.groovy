@@ -8,22 +8,26 @@ import java.nio.file.Paths
 import java.nio.file.Files
 import java.util.logging.Logger
 
+// Initialize logger for debugging and informational messages
 def logger = Logger.getLogger("")
+
+// Get Jenkins instance and credentials store
 def jenkins = Jenkins.getInstance()
 def domain = Domain.global()
 def store = jenkins.getExtensionList("com.cloudbees.plugins.credentials.SystemCredentialsProvider")[0].getStore()
 
-// First check for token in environment variables (passed from Docker's .env file)
+// First check for GitHub token in environment variables (Docker containers often pass credentials this way)
 String token = System.getenv("GITHUB_TOKEN")
 logger.info("Checking for GitHub token in environment variables")
 
-// If not found in environment, try reading from files
+// If token is not found in environment variables, try reading from files
 if (!token) {
     logger.info("Token not found in environment variables, checking .env files")
     
-    // Read GitHub token from .env file inside container
+    // Try reading from primary .env file inside container
     def envFile = new File('/var/jenkins_home/.env')
     if (envFile.exists()) {
+        // Parse each line looking for GITHUB_TOKEN
         envFile.eachLine { line ->
             if (line.startsWith('GITHUB_TOKEN=')) {
                 token = line.substring('GITHUB_TOKEN='.length())
@@ -34,10 +38,11 @@ if (!token) {
         logger.info("/var/jenkins_home/.env file not found")
     }
 
-    // If token wasn't found, check alternative location
+    // If still no token, check alternative location
     if (!token) {
         def altEnvFile = new File('/home/ubuntu/jenkins/.env')
         if (altEnvFile.exists()) {
+            // Parse each line looking for GITHUB_TOKEN
             altEnvFile.eachLine { line ->
                 if (line.startsWith('GITHUB_TOKEN=')) {
                     token = line.substring('GITHUB_TOKEN='.length())
@@ -51,23 +56,25 @@ if (!token) {
 }
 
 if (token) {
-    // Check if credentials already exist
+    // Check if credentials already exist to avoid duplicates
     def existingCreds = store.getCredentials(domain).find { it.id == 'github-token' }
     
     if (existingCreds) {
         logger.info("GitHub token credentials already exist with ID: github-token")
     } else {
-        // Create GitHub token credentials
+        // Create new GitHub token credentials
         def credentials = new StringCredentialsImpl(
-            CredentialsScope.GLOBAL,
-            "github-token",
-            "GitHub Access Token",
-            Secret.fromString(token)
+            CredentialsScope.GLOBAL,         // Available throughout Jenkins
+            "github-token",                  // Credential ID referenced in jobs
+            "GitHub Access Token",           // Human-readable description
+            Secret.fromString(token)         // Securely store the token value
         )
         
+        // Add the credentials to the Jenkins store
         store.addCredentials(domain, credentials)
         logger.info("GitHub token credentials added with ID: github-token")
     }
 } else {
+    // Log warning if no token could be found
     logger.warning("GitHub token not found in environment variables or .env files")
 }
