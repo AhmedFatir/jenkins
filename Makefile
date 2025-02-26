@@ -1,15 +1,15 @@
 all:
 	clear
-	docker compose up --build
+	docker-compose up --build
 
 down:
-	docker compose down
+	docker-compose down
 
 stop:
-	docker compose stop
+	docker-compose stop
 
 start:
-	docker compose start
+	docker-compose start
 
 clean:
 	@docker stop $$(docker ps -qa) || true
@@ -24,6 +24,6 @@ prune: clean
 re: clean all
 
 jk:
-	@docker compose exec -it jenkins bash
+	@docker-compose exec -it jenkins bash
 
 .PHONY: all up down stop start clean re prune
