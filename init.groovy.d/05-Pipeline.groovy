@@ -83,7 +83,7 @@ def createPipelineScript() {
             stage('Apply K8s Manifests') {
                 steps {
                     // Apply all Kubernetes manifests in the k8s directory
-                    sh "kubectl apply -Rf k8s/"
+                    sh "chmod +x k8s/deploy.sh && ./k8s/deploy.sh"
                 }
             }
             stage('Verify Deployment') {
