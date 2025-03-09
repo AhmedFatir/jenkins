@@ -22,10 +22,9 @@ def plugins = [
     'credentials'                       // Core credentials plugin
 ]
 
-// Get Jenkins instance and plugin manager
-def jenkins = Jenkins.instance
-def pm = jenkins.pluginManager
-def uc = jenkins.updateCenter
+// Get PluginManager and UpdateCenter instances
+def pm = Jenkins.instance.pluginManager
+def uc = Jenkins.instance.updateCenter
 
 // Refresh update center data to get latest plugin information
 uc.updateAllSites()
@@ -36,14 +35,12 @@ def restartRequired = false
 // Loop through each plugin and install if not already present
 plugins.each { plugin ->
     if (!pm.getPlugin(plugin)) {
-        // Look up the plugin in the update center
-        def pluginInstance = uc.getPlugin(plugin)
+        def pluginInstance = uc.getPlugin(plugin) // Look up the plugin in the update center
         if (pluginInstance) {
-            // Deploy and install the plugin
-            def installFuture = pluginInstance.deploy()
+            def installFuture = pluginInstance.deploy() // Deploy and install the plugin
             installFuture.get() // Wait for the plugin to be installed
             logger.info("Installed: $plugin")
-            restartRequired = true
+            restartRequired = true // Set flag to restart Jenkins
         }
         else {
             logger.warning("Plugin not found in update center: $plugin")
@@ -55,11 +52,11 @@ plugins.each { plugin ->
 }
 
 // If plugins were installed, save Jenkins state and restart to apply changes
-if (restartRequired && !jenkins.isQuietingDown()) {
+if (restartRequired && !Jenkins.instance.isQuietingDown()) {
     logger.info("Saving Jenkins state before restart...")
-    jenkins.save()
+    Jenkins.instance.save()
     logger.info("Restarting Jenkins to complete plugin installation...")
-    jenkins.safeRestart()
+    Jenkins.instance.safeRestart()
     // Terminate the JVM to prevent further script execution
     System.exit(0)
 }

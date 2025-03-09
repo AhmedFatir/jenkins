@@ -8,8 +8,7 @@ import hudson.util.Secret
 // Initialize logger for debugging and informational messages
 def logger = Logger.getLogger("")
 
-// def jenkins = Jenkins.instance
-// def pluginManager = jenkins.pluginManager
+// Get the OCI plugin and credentials class
 def ociPlugin = Jenkins.instance.pluginManager.getPlugin("oracle-cloud-infrastructure-devops")
 def ociCredentialsClass = ociPlugin.classLoader.loadClass("io.jenkins.plugins.oci.credentials.CloudCredentialsImpl")
 if (!ociCredentialsClass) {
@@ -62,9 +61,7 @@ def credentials = constructor.newInstance(
     region                    // OCI region
 )
 
-    // Add the credentials to the Jenkins store
-def domain = Domain.global()
+// Add the credentials to the Jenkins store
 def store = Jenkins.instance.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
-store.addCredentials(domain, credentials)
-
-logger.info("OCI credentials added to Jenkins.")
+store.addCredentials(Domain.global(), credentials)
+logger.info("OCI credentials added with ID: oci-credentials")

@@ -8,9 +8,6 @@ import java.util.logging.Logger
 // Initialize logger for debugging and informational messages
 def logger = Logger.getLogger("")
 
-// Get Jenkins instance and credentials store
-def instance = Jenkins.getInstance()
-def store = instance.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
 
 // Read the Kubernetes configuration file
 def kubeconfigFile = new File('/var/jenkins_home/.kube/config')
@@ -25,8 +22,6 @@ def kubeconfigCreds = new StringCredentialsImpl(
 )
 
 // Add the credentials to the Jenkins store
+def store = Jenkins.instance.getExtensionList('com.cloudbees.plugins.credentials.SystemCredentialsProvider')[0].getStore()
 store.addCredentials(Domain.global(), kubeconfigCreds)
-
-// Save Jenkins configuration
-instance.save()
-logger.info("Kubernetes Config Credentials Added")
+logger.info("Kubernetes Config Credentials Added with ID: kubeconfig")
