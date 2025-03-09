@@ -30,7 +30,7 @@ def uc = jenkins.updateCenter
 // Refresh update center data to get latest plugin information
 uc.updateAllSites()
 
-println "Installing Jenkins Plugins..."
+logger.info("Installing Jenkins Plugins...")
 def restartRequired = false
 
 // Loop through each plugin and install if not already present
@@ -42,20 +42,24 @@ plugins.each { plugin ->
             // Deploy and install the plugin
             def installFuture = pluginInstance.deploy()
             installFuture.get() // Wait for the plugin to be installed
-            println "Installed: $plugin"
+            logger.info("Installed: $plugin")
             restartRequired = true
-        } else {
-            println "Plugin not found: $plugin"
         }
-    } else {
-        println "Already installed: $plugin"
+        else {
+            logger.warning("Plugin not found in update center: $plugin")
+        }
+    }
+    else {
+        logger.info("Already installed: $plugin")
     }
 }
 
 // If plugins were installed, save Jenkins state and restart to apply changes
 if (restartRequired && !jenkins.isQuietingDown()) {
-    println "Saving Jenkins state before restart..."
+    logger.info("Saving Jenkins state before restart...")
     jenkins.save()
-    println "Restarting Jenkins to complete plugin installation..."
+    logger.info("Restarting Jenkins to complete plugin installation...")
     jenkins.safeRestart()
+    // Terminate the JVM to prevent further script execution
+    System.exit(0)
 }

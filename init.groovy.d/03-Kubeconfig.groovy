@@ -3,6 +3,10 @@ import com.cloudbees.plugins.credentials.*
 import com.cloudbees.plugins.credentials.domains.*
 import org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl
 import hudson.util.Secret
+import java.util.logging.Logger
+
+// Initialize logger for debugging and informational messages
+def logger = Logger.getLogger("")
 
 // Get Jenkins instance and credentials store
 def instance = Jenkins.getInstance()
@@ -25,4 +29,4 @@ store.addCredentials(Domain.global(), kubeconfigCreds)
 
 // Save Jenkins configuration
 instance.save()
-println "Kubernetes Config Credentials Added"
+logger.info("Kubernetes Config Credentials Added")

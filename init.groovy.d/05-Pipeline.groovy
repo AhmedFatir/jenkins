@@ -38,7 +38,8 @@ if (job == null) {
     // Trigger an initial build to immediately deploy the infrastructure
     job.scheduleBuild2(0)
     logger.info("Initial build triggered for the newly created job.")
-} else {
+} 
+else {
     // Job already exists, update its configuration
     logger.info("Updating existing Jenkins Pipeline Job: ${jobName}")
     
