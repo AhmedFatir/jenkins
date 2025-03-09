@@ -75,7 +75,8 @@ def createPipelineScript() {
                             while (externalIp == "") {
                                 echo "Waiting for external IP..."
                                 externalIp = sh(
-                                    script: 'kubectl get svc nginx --template="{{range .status.loadBalancer.ingress}}{{.ip}}{{end}}"', 
+                                    // script: 'kubectl get svc nginx --template="{{range .status.loadBalancer.ingress}}{{.ip}}{{end}}"', 
+                                    script: "kubectl get svc nginx -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'", 
                                     returnStdout: true
                                 ).trim()
                                 
